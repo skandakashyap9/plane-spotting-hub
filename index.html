@@ -1,0 +1,234 @@
+<!--
+  PLANE SPOTTING GALLERY
+
+  Deploy to GitHub Pages:
+    1. Save this file as `index.html` in a public repo
+    2. Put your photos in a `photos/` folder beside it
+    3. Edit the `photos` array below to match your filenames
+    4. Repo Settings -> Pages -> Deploy from branch -> main
+    5. In Google Sites: Insert -> Embed -> By URL -> https://USER.github.io/REPO/
+
+  Photo paths are relative (`photos/whatever.jpg`) — they resolve against
+  wherever this index.html is served from, so no hardcoded usernames.
+-->
+<style>
+  .ps-app, .ps-app * { box-sizing: border-box; margin: 0; padding: 0; }
+  .ps-app {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1d1d1f;
+    background: #fafafa;
+    padding: 28px 24px 40px;
+    min-height: 600px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .ps-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding-bottom: 16px; border-bottom: 1px solid #e5e5e7; margin-bottom: 22px;
+  }
+  .ps-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; }
+  .ps-subtitle { font-size: 13px; color: #6b7280; margin-top: 2px; }
+  .ps-count { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
+
+  .ps-filters { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+  .ps-filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .ps-filter-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: #6b7280; min-width: 70px;
+  }
+  .ps-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ps-chip {
+    padding: 5px 12px; border: 1px solid #d1d5db; background: #fff;
+    border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer;
+    color: #1d1d1f; transition: all 0.12s; font-family: inherit;
+  }
+  .ps-chip:hover { border-color: #1d1d1f; }
+  .ps-chip.active { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+
+  .ps-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
+  }
+  .ps-card {
+    position: relative; overflow: hidden; border-radius: 8px;
+    aspect-ratio: 4/3; cursor: pointer; background: #e5e7eb;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+  .ps-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ps-card-meta {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 28px 12px 10px;
+    background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0));
+    color: #fff;
+  }
+  .ps-card-airline { font-size: 13px; font-weight: 600; line-height: 1.2; }
+  .ps-card-aircraft { font-size: 11px; opacity: 0.88; margin-top: 2px; line-height: 1.3; }
+  .ps-card-reg {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(255,255,255,0.95); color: #1d1d1f;
+    font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.02em;
+  }
+
+  .ps-empty { grid-column: 1/-1; text-align: center; padding: 64px 24px; color: #6b7280; font-size: 14px; }
+
+  .ps-lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.94);
+    display: none; align-items: center; justify-content: center;
+    z-index: 9999; padding: 24px;
+  }
+  .ps-lightbox.open { display: flex; }
+  .ps-lightbox-inner { max-width: 92vw; max-height: 92vh; position: relative; }
+  .ps-lightbox img {
+    max-width: 92vw; max-height: 78vh; object-fit: contain;
+    display: block; margin: 0 auto; border-radius: 4px;
+  }
+  .ps-lightbox-info { color: #fff; padding-top: 14px; text-align: center; }
+  .ps-lightbox-info-1 { font-size: 17px; font-weight: 600; }
+  .ps-lightbox-info-2 { font-size: 12px; opacity: 0.75; margin-top: 4px; font-family: ui-monospace, monospace; }
+  .ps-lightbox-close {
+    position: absolute; top: -36px; right: -4px;
+    background: transparent; border: 0; color: #fff;
+    font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1;
+  }
+
+  @media (max-width: 640px) {
+    .ps-app { padding: 20px 16px 32px; }
+    .ps-title { font-size: 22px; }
+    .ps-filter-label { min-width: auto; width: 100%; }
+    .ps-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  }
+</style>
+
+<div class="ps-app">
+  <header class="ps-header">
+    <div>
+      <h1 class="ps-title">Plane Spotting</h1>
+      <div class="ps-subtitle">Photos from the field</div>
+    </div>
+    <span class="ps-count" id="ps-count"></span>
+  </header>
+
+  <div class="ps-filters">
+    <div class="ps-filter-row">
+      <span class="ps-filter-label">Airline</span>
+      <div class="ps-chips" id="ps-airline-chips"></div>
+    </div>
+    <div class="ps-filter-row">
+      <span class="ps-filter-label">Aircraft</span>
+      <div class="ps-chips" id="ps-aircraft-chips"></div>
+    </div>
+  </div>
+
+  <div class="ps-grid" id="ps-grid"></div>
+
+  <div class="ps-lightbox" id="ps-lightbox">
+    <div class="ps-lightbox-inner">
+      <button class="ps-lightbox-close" id="ps-close" aria-label="Close">&times;</button>
+      <img id="ps-lightbox-img" src="" alt="">
+      <div class="ps-lightbox-info">
+        <div class="ps-lightbox-info-1" id="ps-lb-1"></div>
+        <div class="ps-lightbox-info-2" id="ps-lb-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ============================================================
+  // EDIT THIS: your photos go here.
+  // - url:      direct image URL (Cloudinary, GitHub, S3, Drive, etc.)
+  // - airline:  string, used for the airline filter (be consistent)
+  // - aircraft: string, used for the aircraft filter (be consistent)
+  // - reg:      registration tag shown on the card
+  // - location: airport code or place
+  // - date:     YYYY-MM-DD
+  // ============================================================
+  const photos = [
+    { url: "photos/N12345-2024-09-12.jpg", airline: "United",          aircraft: "Boeing 737-800",    reg: "N12345",  location: "LAX", date: "2024-09-12" },
+    { url: "photos/N2749U-2024-10-03.jpg", airline: "United",          aircraft: "Boeing 777-300ER",  reg: "N2749U",  location: "SFO", date: "2024-10-03" },
+    { url: "photos/N401DX-2024-08-21.jpg", airline: "Delta",           aircraft: "Airbus A320neo",    reg: "N401DX",  location: "ATL", date: "2024-08-21" },
+    { url: "photos/N6701-2024-07-15.jpg",  airline: "Delta",           aircraft: "Boeing 757-200",    reg: "N6701",   location: "JFK", date: "2024-07-15" },
+    { url: "photos/N832AA-2024-11-02.jpg", airline: "American",        aircraft: "Boeing 787-9",      reg: "N832AA",  location: "DFW", date: "2024-11-02" },
+    { url: "photos/N311AA-2024-06-28.jpg", airline: "American",        aircraft: "Boeing 737 MAX 8",  reg: "N311AA",  location: "MIA", date: "2024-06-28" },
+    { url: "photos/D-AIXA-2024-05-14.jpg", airline: "Lufthansa",       aircraft: "Airbus A350-900",   reg: "D-AIXA",  location: "FRA", date: "2024-05-14" },
+    { url: "photos/D-ABYC-2024-09-30.jpg", airline: "Lufthansa",       aircraft: "Boeing 747-8",      reg: "D-ABYC",  location: "FRA", date: "2024-09-30" },
+    { url: "photos/A6-EUA-2024-04-09.jpg", airline: "Emirates",        aircraft: "Airbus A380-800",   reg: "A6-EUA",  location: "DXB", date: "2024-04-09" },
+    { url: "photos/9V-SCA-2024-03-22.jpg", airline: "Singapore",       aircraft: "Boeing 787-10",     reg: "9V-SCA",  location: "SIN", date: "2024-03-22" },
+    { url: "photos/G-XLEA-2024-10-19.jpg", airline: "British Airways", aircraft: "Airbus A380-800",   reg: "G-XLEA",  location: "LHR", date: "2024-10-19" },
+    { url: "photos/JA784A-2024-08-05.jpg", airline: "ANA",             aircraft: "Boeing 777-300ER",  reg: "JA784A",  location: "HND", date: "2024-08-05" }
+  ];
+  // ============================================================
+
+  let fAirline = "All";
+  let fAircraft = "All";
+
+  const $ = id => document.getElementById(id);
+  const uniq = key => ["All", ...Array.from(new Set(photos.map(p => p[key]))).sort()];
+
+  function renderChips(target, key, current, onPick) {
+    const el = $(target);
+    el.innerHTML = "";
+    uniq(key).forEach(val => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "ps-chip" + (val === current ? " active" : "");
+      b.textContent = val;
+      b.addEventListener("click", () => { onPick(val); renderAll(); });
+      el.appendChild(b);
+    });
+  }
+
+  function renderGrid() {
+    const f = photos.filter(p =>
+      (fAirline === "All" || p.airline === fAirline) &&
+      (fAircraft === "All" || p.aircraft === fAircraft)
+    );
+    $("ps-count").textContent = f.length + " photo" + (f.length === 1 ? "" : "s");
+    const grid = $("ps-grid");
+    if (f.length === 0) {
+      grid.innerHTML = '<div class="ps-empty">No photos match these filters.</div>';
+      return;
+    }
+    grid.innerHTML = f.map(p => {
+      const idx = photos.indexOf(p);
+      return `
+        <div class="ps-card" data-idx="${idx}">
+          <img src="${p.url}" alt="${p.airline} ${p.aircraft} ${p.reg}" loading="lazy" onerror="this.style.display='none'">
+          <div class="ps-card-reg">${p.reg}</div>
+          <div class="ps-card-meta">
+            <div class="ps-card-airline">${p.airline}</div>
+            <div class="ps-card-aircraft">${p.aircraft} &middot; ${p.location}</div>
+          </div>
+        </div>`;
+    }).join("");
+    grid.querySelectorAll(".ps-card").forEach(card => {
+      card.addEventListener("click", () => openLightbox(parseInt(card.dataset.idx, 10)));
+    });
+  }
+
+  function renderAll() {
+    renderChips("ps-airline-chips",  "airline",  fAirline,  v => fAirline = v);
+    renderChips("ps-aircraft-chips", "aircraft", fAircraft, v => fAircraft = v);
+    renderGrid();
+  }
+
+  function openLightbox(idx) {
+    const p = photos[idx];
+    $("ps-lightbox-img").src = p.url;
+    $("ps-lightbox-img").alt = p.airline + " " + p.aircraft;
+    $("ps-lb-1").textContent = p.airline + " \u00b7 " + p.aircraft;
+    $("ps-lb-2").textContent = p.reg + " \u00b7 " + p.location + " \u00b7 " + p.date;
+    $("ps-lightbox").classList.add("open");
+  }
+  function closeLightbox() { $("ps-lightbox").classList.remove("open"); }
+
+  $("ps-close").addEventListener("click", closeLightbox);
+  $("ps-lightbox").addEventListener("click", e => {
+    if (e.target.id === "ps-lightbox") closeLightbox();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
+
+  renderAll();
+})();
+</script>
