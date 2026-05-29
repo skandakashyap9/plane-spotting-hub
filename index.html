@@ -117,6 +117,14 @@
       <span class="ps-filter-label">Aircraft</span>
       <div class="ps-chips" id="ps-aircraft-chips"></div>
     </div>
+    <div class="ps-filter-row">
+      <span class="ps-filter-label">Airport</span>
+      <div class="ps-chips" id="ps-airport-chips"></div>
+    </div>
+    <div class="ps-filter-row">
+      <span class="ps-filter-label">Date</span>
+      <div class="ps-chips" id="ps-date-chips"></div>
+    </div>
   </div>
 
   <div class="ps-grid" id="ps-grid"></div>
@@ -164,6 +172,8 @@
 
   let fAirline = "All";
   let fAircraft = "All";
+  let fAirport = "All";
+  let fDate = "All";
 
   const $ = id => document.getElementById(id);
   const uniq = key => ["All", ...Array.from(new Set(photos.map(p => p[key]))).sort()];
@@ -184,7 +194,9 @@
   function renderGrid() {
     const f = photos.filter(p =>
       (fAirline === "All" || p.airline === fAirline) &&
-      (fAircraft === "All" || p.aircraft === fAircraft)
+      (fAircraft === "All" || p.aircraft === fAircraft) &&
+      (fAirport === "All" || p.location === fAirport) &&
+      (fDate === "All" || p.date === fDate)
     );
     $("ps-count").textContent = f.length + " photo" + (f.length === 1 ? "" : "s");
     const grid = $("ps-grid");
@@ -212,6 +224,8 @@
   function renderAll() {
     renderChips("ps-airline-chips",  "airline",  fAirline,  v => fAirline = v);
     renderChips("ps-aircraft-chips", "aircraft", fAircraft, v => fAircraft = v);
+    renderChips("ps-airport-chips",  "location", fAirport,  v => fAirport = v);
+    renderChips("ps-date-chips",     "date",     fDate,     v => fDate = v);
     renderGrid();
   }
 
