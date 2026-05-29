@@ -12,122 +12,218 @@
   wherever this index.html is served from, so no hardcoded usernames.
 -->
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
   .ps-app, .ps-app * { box-sizing: border-box; margin: 0; padding: 0; }
+
   .ps-app {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #1d1d1f;
-    background: #fafafa;
-    padding: 28px 24px 40px;
-    min-height: 600px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #0f172a;
+    background: linear-gradient(160deg, #e8f0fe 0%, #f0f4ff 40%, #faf5ff 100%);
+    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
-  .ps-header {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding-bottom: 16px; border-bottom: 1px solid #e5e5e7; margin-bottom: 22px;
-  }
-  .ps-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: #1d1d1f; }
-  .ps-subtitle { font-size: 13px; color: #6b7280; margin-top: 2px; }
-  .ps-count { font-size: 13px; color: #6b7280; font-variant-numeric: tabular-nums; }
 
-  .ps-filters { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-  .ps-filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  /* ── Hero banner ── */
+  .ps-hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 45%, #4f46e5 100%);
+    padding: 36px 32px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ps-hero::before {
+    content: "✈";
+    position: absolute;
+    right: 40px; top: 50%;
+    transform: translateY(-50%) rotate(15deg);
+    font-size: 120px;
+    opacity: 0.08;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .ps-hero-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .ps-title {
+    font-size: 30px; font-weight: 700; letter-spacing: -0.03em;
+    color: #fff; line-height: 1.15;
+  }
+  .ps-subtitle { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 5px; font-weight: 400; letter-spacing: 0.01em; }
+  .ps-count-badge {
+    background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  /* ── Filter panel ── */
+  .ps-filter-panel {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(148,163,184,0.2);
+    padding: 18px 32px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 12px rgba(30,58,138,0.06);
+  }
+  .ps-filter-grid {
+    max-width: 1200px; margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 32px;
+  }
+  .ps-filter-row { display: flex; align-items: flex-start; gap: 10px; }
   .ps-filter-label {
-    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-    color: #6b7280; min-width: 70px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: #64748b; padding-top: 7px; min-width: 60px; flex-shrink: 0;
   }
-  .ps-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ps-chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .ps-chip {
-    padding: 5px 12px; border: 1px solid #d1d5db; background: #fff;
-    border-radius: 999px; font-size: 12px; font-weight: 500; cursor: pointer;
-    color: #1d1d1f; transition: all 0.12s; font-family: inherit;
+    padding: 5px 11px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    border-radius: 999px;
+    font-size: 11.5px; font-weight: 500; cursor: pointer;
+    color: #475569;
+    transition: all 0.14s ease;
+    font-family: inherit;
+    line-height: 1.4;
   }
-  .ps-chip:hover { border-color: #1d1d1f; }
-  .ps-chip.active { background: #1d1d1f; color: #fff; border-color: #1d1d1f; }
+  .ps-chip:hover { border-color: #6366f1; color: #4f46e5; background: #eef2ff; }
+  .ps-chip.active {
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff; border-color: transparent;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.35);
+  }
 
+  /* ── Main content ── */
+  .ps-main { max-width: 1200px; margin: 0 auto; padding: 28px 32px 48px; }
+
+  /* ── Grid ── */
   .ps-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 18px;
   }
   .ps-card {
-    position: relative; overflow: hidden; border-radius: 8px;
-    aspect-ratio: 4/3; cursor: pointer; background: #e5e7eb;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    position: relative; overflow: hidden; border-radius: 12px;
+    aspect-ratio: 4/3; cursor: pointer;
+    background: #dde4f0;
+    box-shadow: 0 1px 4px rgba(15,23,42,0.08), 0 4px 16px rgba(15,23,42,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .ps-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-  .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .ps-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 8px 30px rgba(15,23,42,0.15), 0 2px 8px rgba(15,23,42,0.08);
+  }
+  .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+  .ps-card:hover img { transform: scale(1.04); }
   .ps-card-meta {
     position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 28px 12px 10px;
-    background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0));
+    padding: 40px 14px 12px;
+    background: linear-gradient(to top, rgba(5,10,30,0.88) 0%, rgba(5,10,30,0.3) 60%, transparent 100%);
     color: #fff;
   }
-  .ps-card-airline { font-size: 13px; font-weight: 600; line-height: 1.2; }
-  .ps-card-aircraft { font-size: 11px; opacity: 0.88; margin-top: 2px; line-height: 1.3; }
+  .ps-card-airline { font-size: 13.5px; font-weight: 700; line-height: 1.2; letter-spacing: 0.01em; }
+  .ps-card-aircraft { font-size: 11px; opacity: 0.82; margin-top: 3px; line-height: 1.3; }
   .ps-card-reg {
+    position: absolute; top: 10px; left: 10px;
+    background: rgba(255,255,255,0.95);
+    color: #1e3a8a;
+    font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 5px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.04em;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .ps-card-airport {
     position: absolute; top: 10px; right: 10px;
-    background: rgba(255,255,255,0.95); color: #1d1d1f;
-    font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 4px;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.02em;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff;
+    font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px;
+    letter-spacing: 0.06em;
+    box-shadow: 0 1px 4px rgba(99,102,241,0.4);
   }
 
-  .ps-empty { grid-column: 1/-1; text-align: center; padding: 64px 24px; color: #6b7280; font-size: 14px; }
+  .ps-empty {
+    grid-column: 1/-1; text-align: center; padding: 80px 24px;
+    color: #94a3b8; font-size: 15px;
+  }
+  .ps-empty-icon { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.5; }
 
+  /* ── Lightbox ── */
   .ps-lightbox {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.94);
+    position: fixed; inset: 0;
+    background: rgba(2,6,23,0.95);
     display: none; align-items: center; justify-content: center;
     z-index: 9999; padding: 24px;
+    backdrop-filter: blur(4px);
   }
   .ps-lightbox.open { display: flex; }
   .ps-lightbox-inner { max-width: 92vw; max-height: 92vh; position: relative; }
   .ps-lightbox img {
-    max-width: 92vw; max-height: 78vh; object-fit: contain;
-    display: block; margin: 0 auto; border-radius: 4px;
+    max-width: 92vw; max-height: 76vh; object-fit: contain;
+    display: block; margin: 0 auto; border-radius: 8px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
   }
-  .ps-lightbox-info { color: #fff; padding-top: 14px; text-align: center; }
-  .ps-lightbox-info-1 { font-size: 17px; font-weight: 600; }
-  .ps-lightbox-info-2 { font-size: 12px; opacity: 0.75; margin-top: 4px; font-family: ui-monospace, monospace; }
+  .ps-lightbox-info { color: #fff; padding-top: 16px; text-align: center; }
+  .ps-lightbox-info-1 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .ps-lightbox-info-2 {
+    font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 5px;
+    font-family: ui-monospace, monospace; letter-spacing: 0.04em;
+  }
   .ps-lightbox-close {
-    position: absolute; top: -36px; right: -4px;
-    background: transparent; border: 0; color: #fff;
-    font-size: 22px; cursor: pointer; padding: 4px 8px; line-height: 1;
+    position: absolute; top: -44px; right: 0;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 18px; cursor: pointer;
+    padding: 6px 12px; line-height: 1; border-radius: 8px;
+    transition: background 0.12s;
   }
+  .ps-lightbox-close:hover { background: rgba(255,255,255,0.2); }
 
-  @media (max-width: 640px) {
-    .ps-app { padding: 20px 16px 32px; }
+  @media (max-width: 768px) {
+    .ps-hero { padding: 24px 20px 20px; }
     .ps-title { font-size: 22px; }
-    .ps-filter-label { min-width: auto; width: 100%; }
-    .ps-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    .ps-filter-panel { padding: 14px 20px; position: static; }
+    .ps-filter-grid { grid-template-columns: 1fr; gap: 10px; }
+    .ps-main { padding: 20px 16px 40px; }
+    .ps-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+    .ps-hero::before { display: none; }
   }
 </style>
 
 <div class="ps-app">
-  <header class="ps-header">
-    <div>
-      <h1 class="ps-title">Welcome to Skanda's Plane Spotting Hub</h1>
-      <div class="ps-subtitle">Aviation Photography from Airports Around the World!</div>
+
+  <header class="ps-hero">
+    <div class="ps-hero-inner">
+      <div>
+        <h1 class="ps-title">Skanda's Plane Spotting Hub</h1>
+        <div class="ps-subtitle">Aviation Photography from Airports Around the World</div>
+      </div>
+      <span class="ps-count-badge" id="ps-count"></span>
     </div>
-    <span class="ps-count" id="ps-count"></span>
   </header>
 
-  <div class="ps-filters">
-    <div class="ps-filter-row">
-      <span class="ps-filter-label">Airline</span>
-      <div class="ps-chips" id="ps-airline-chips"></div>
-    </div>
-    <div class="ps-filter-row">
-      <span class="ps-filter-label">Aircraft</span>
-      <div class="ps-chips" id="ps-aircraft-chips"></div>
-    </div>
-    <div class="ps-filter-row">
-      <span class="ps-filter-label">Airport</span>
-      <div class="ps-chips" id="ps-airport-chips"></div>
-    </div>
-    <div class="ps-filter-row">
-      <span class="ps-filter-label">Date</span>
-      <div class="ps-chips" id="ps-date-chips"></div>
+  <div class="ps-filter-panel">
+    <div class="ps-filter-grid">
+      <div class="ps-filter-row">
+        <span class="ps-filter-label">Airline</span>
+        <div class="ps-chips" id="ps-airline-chips"></div>
+      </div>
+      <div class="ps-filter-row">
+        <span class="ps-filter-label">Aircraft</span>
+        <div class="ps-chips" id="ps-aircraft-chips"></div>
+      </div>
+      <div class="ps-filter-row">
+        <span class="ps-filter-label">Airport</span>
+        <div class="ps-chips" id="ps-airport-chips"></div>
+      </div>
+      <div class="ps-filter-row">
+        <span class="ps-filter-label">Date</span>
+        <div class="ps-chips" id="ps-date-chips"></div>
+      </div>
     </div>
   </div>
 
-  <div class="ps-grid" id="ps-grid"></div>
+  <div class="ps-main">
+    <div class="ps-grid" id="ps-grid"></div>
+  </div>
 
   <div class="ps-lightbox" id="ps-lightbox">
     <div class="ps-lightbox-inner">
@@ -157,10 +253,10 @@
     { url: "photos/N2749U-2024-10-03.jpg", airline: "United",          aircraft: "Boeing 777-300ER",  reg: "N2749U",  location: "SFO", date: "2024-10-03" },
     { url: "photos/N401DX-2024-08-21.jpg", airline: "Delta",           aircraft: "Airbus A320neo",    reg: "N401DX",  location: "ATL", date: "2024-08-21" },
     { url: "photos/N6701-2024-07-15.jpg",  airline: "Delta",           aircraft: "Boeing 757-200",    reg: "N6701",   location: "JFK", date: "2024-07-15" },
-    { url: "photos/N832AA-2024-11-02.jpg", airline: "American",        aircraft: "E175",      reg: "N209CL",  location: "DFW", date: "2026-05-27" },
-    { url: "photos/american3.jpg", airline: "American",        aircraft: "CRJ700",  reg: "N5437",  location: "DFW", date: "2026-05-27" },
-    { url: "photos/american2.jpg", airline: "American",        aircraft: "Airbus A321",  reg: "N162AA",  location: "DFW", date: "2026-05-27" },
-    { url: "photos/american1.jpg", airline: "American",        aircraft: "Airbus A321",  reg: "N167AN",  location: "DFW", date: "2026-05-27" },
+    { url: "photos/N832AA-2024-11-02.jpg", airline: "American",        aircraft: "E175",              reg: "N209CL",  location: "DFW", date: "2026-05-27" },
+    { url: "photos/american3.jpg",         airline: "American",        aircraft: "CRJ700",            reg: "N5437",   location: "DFW", date: "2026-05-27" },
+    { url: "photos/american2.jpg",         airline: "American",        aircraft: "Airbus A321",       reg: "N162AA",  location: "DFW", date: "2026-05-27" },
+    { url: "photos/american1.jpg",         airline: "American",        aircraft: "Airbus A321",       reg: "N167AN",  location: "DFW", date: "2026-05-27" },
     { url: "photos/D-AIXA-2024-05-14.jpg", airline: "Lufthansa",       aircraft: "Airbus A350-900",   reg: "D-AIXA",  location: "FRA", date: "2024-05-14" },
     { url: "photos/D-ABYC-2024-09-30.jpg", airline: "Lufthansa",       aircraft: "Boeing 747-8",      reg: "D-ABYC",  location: "FRA", date: "2024-09-30" },
     { url: "photos/A6-EUA-2024-04-09.jpg", airline: "Emirates",        aircraft: "Airbus A380-800",   reg: "A6-EUA",  location: "DXB", date: "2024-04-09" },
@@ -170,10 +266,10 @@
   ];
   // ============================================================
 
-  let fAirline = "All";
+  let fAirline  = "All";
   let fAircraft = "All";
-  let fAirport = "All";
-  let fDate = "All";
+  let fAirport  = "All";
+  let fDate     = "All";
 
   const $ = id => document.getElementById(id);
   const uniq = key => ["All", ...Array.from(new Set(photos.map(p => p[key]))).sort()];
@@ -193,15 +289,15 @@
 
   function renderGrid() {
     const f = photos.filter(p =>
-      (fAirline === "All" || p.airline === fAirline) &&
+      (fAirline  === "All" || p.airline  === fAirline)  &&
       (fAircraft === "All" || p.aircraft === fAircraft) &&
-      (fAirport === "All" || p.location === fAirport) &&
-      (fDate === "All" || p.date === fDate)
+      (fAirport  === "All" || p.location === fAirport)  &&
+      (fDate     === "All" || p.date     === fDate)
     );
     $("ps-count").textContent = f.length + " photo" + (f.length === 1 ? "" : "s");
     const grid = $("ps-grid");
     if (f.length === 0) {
-      grid.innerHTML = '<div class="ps-empty">No photos match these filters.</div>';
+      grid.innerHTML = '<div class="ps-empty"><span class="ps-empty-icon">🔍</span>No photos match these filters.</div>';
       return;
     }
     grid.innerHTML = f.map(p => {
@@ -210,9 +306,10 @@
         <div class="ps-card" data-idx="${idx}">
           <img src="${p.url}" alt="${p.airline} ${p.aircraft} ${p.reg}" loading="lazy" onerror="this.style.display='none'">
           <div class="ps-card-reg">${p.reg}</div>
+          <div class="ps-card-airport">${p.location}</div>
           <div class="ps-card-meta">
             <div class="ps-card-airline">${p.airline}</div>
-            <div class="ps-card-aircraft">${p.aircraft} &middot; ${p.location}</div>
+            <div class="ps-card-aircraft">${p.aircraft} &middot; ${p.date}</div>
           </div>
         </div>`;
     }).join("");
@@ -222,10 +319,10 @@
   }
 
   function renderAll() {
-    renderChips("ps-airline-chips",  "airline",  fAirline,  v => fAirline = v);
+    renderChips("ps-airline-chips",  "airline",  fAirline,  v => fAirline  = v);
     renderChips("ps-aircraft-chips", "aircraft", fAircraft, v => fAircraft = v);
-    renderChips("ps-airport-chips",  "location", fAirport,  v => fAirport = v);
-    renderChips("ps-date-chips",     "date",     fDate,     v => fDate = v);
+    renderChips("ps-airport-chips",  "location", fAirport,  v => fAirport  = v);
+    renderChips("ps-date-chips",     "date",     fDate,     v => fDate     = v);
     renderGrid();
   }
 
@@ -233,8 +330,8 @@
     const p = photos[idx];
     $("ps-lightbox-img").src = p.url;
     $("ps-lightbox-img").alt = p.airline + " " + p.aircraft;
-    $("ps-lb-1").textContent = p.airline + " \u00b7 " + p.aircraft;
-    $("ps-lb-2").textContent = p.reg + " \u00b7 " + p.location + " \u00b7 " + p.date;
+    $("ps-lb-1").textContent = p.airline + " · " + p.aircraft;
+    $("ps-lb-2").textContent = p.reg + " · " + p.location + " · " + p.date;
     $("ps-lightbox").classList.add("open");
   }
   function closeLightbox() { $("ps-lightbox").classList.remove("open"); }
