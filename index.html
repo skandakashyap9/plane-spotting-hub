@@ -114,7 +114,8 @@
     transform: translateY(-4px) scale(1.01);
     box-shadow: 0 8px 30px rgba(15,23,42,0.15), 0 2px 8px rgba(15,23,42,0.08);
   }
-  .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; }
+  .ps-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease; -webkit-user-drag: none; user-select: none; }
+  .ps-card-shield { position: absolute; inset: 0; z-index: 10; }
   .ps-card:hover img { transform: scale(1.04); }
   .ps-card-meta {
     position: absolute; bottom: 0; left: 0; right: 0;
@@ -310,6 +311,7 @@
       const idx = photos.indexOf(p);
       return `
         <div class="ps-card" data-idx="${idx}">
+          <div class="ps-card-shield"></div>
           <img src="${p.url}" alt="${p.airline} ${p.aircraft} ${p.reg}" loading="lazy" onerror="this.style.display='none'">
           <div class="ps-card-reg">${p.reg}</div>
           <div class="ps-card-airport">${p.location}</div>
@@ -347,6 +349,10 @@
     if (e.target.id === "ps-lightbox") closeLightbox();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
+
+  // Block right-click and drag on images
+  document.addEventListener("contextmenu", e => { if (e.target.tagName === "IMG") e.preventDefault(); });
+  document.addEventListener("dragstart",   e => { if (e.target.tagName === "IMG") e.preventDefault(); });
 
   document.getElementById("ps-year").textContent = new Date().getFullYear();
   renderAll();
